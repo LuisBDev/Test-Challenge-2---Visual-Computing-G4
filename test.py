@@ -101,10 +101,10 @@ for f in os.listdir(path):
     except:
         err.append(nm)
 
-correct_predictions = 0
+'''correct_predictions = 0
 for k in range(0, len(img)):
     if (int(actual_rst[k]) == convert(predicted_rst[k])):
         correct_predictions = correct_predictions + 1
 
 accuracy = (correct_predictions/len(img))*100
-print("Accuracy of the model is: ", accuracy)
+print("Accuracy of the model is: ", accuracy)'''
