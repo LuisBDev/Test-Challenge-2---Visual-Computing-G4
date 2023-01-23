@@ -7,15 +7,16 @@ from skimage.feature import hog
 import numpy as np
 import pandas as pd
 import os
+import tensorflow as tf
 from pathlib import Path
 
 from scipy.ndimage.morphology import binary_dilation
 from skimage.io import imread_collection
 
-from tensorflow.keras import models
+'''from tensorflow.keras import models
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.layers import Dense
-from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.utils import to_categorical'''
 
 current_directory = Path(__file__).resolve().parent
 
@@ -24,25 +25,28 @@ option = input("Quieres entrar un nuevo MODELO? (y/n): ")
 if option in ["y", "Y"]:
     train_new_model = True
 
+mnist = tf.keras.datasets.mnist
+
 if train_new_model:
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-    model = models.Sequential()
-    model.add(Dense(256, activation='relu', input_shape=(28*28, )))
-    model.add(Dense(10, activation='softmax'))
+    model = tf.keras.models.Sequential()
+    model.add(tf.keras.layers.Dense(
+        256, activation='relu', input_shape=(28*28, )))
+    model.add(tf.keras.layers.Dense(10, activation='softmax'))
 
     model.compile(optimizer='adam', loss='categorical_crossentropy',
                   metrics=['accuracy'])
     x_train = x_train.reshape(x_train.shape[0], -1)
     x_test = x_test.reshape(x_test.shape[0], -1)
-    y_train = to_categorical(y_train)
-    y_test = to_categorical(y_test)
+    y_train = tf.keras.utils.to_categorical(y_train)
+    y_test = tf.keras.utils.to_categorical(y_test)
 
     history = model.fit(x_train[:, :], y_train, epochs=6, batch_size=64)
     model.save('handwritten_digits.model')
 
 else:
-    model = models.load_model('handwritten_digits.model')
+    model = tf.keras.models.load_model('handwritten_digits.model')
 
 
 def digit_recognition(image, height, width):
