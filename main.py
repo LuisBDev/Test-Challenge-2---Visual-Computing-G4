@@ -19,20 +19,30 @@ from tensorflow.keras.utils import to_categorical
 
 current_directory = Path(__file__).resolve().parent
 
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
+train_new_model = False
+option = input("Quieres entrar un nuevo MODELO? (y/n): ")
+if option in ["y", "Y"]:
+    train_new_model = True
 
-nn = models.Sequential()
-nn.add(Dense(784, activation='relu', input_shape=(28 * 28,)))
-nn.add(Dense(10, activation='softmax'))
+if train_new_model:
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-nn.compile(optimizer='adam', loss='categorical_crossentropy',
-           metrics=['accuracy'])
-x_train = x_train.reshape(x_train.shape[0], -1)
-x_test = x_test.reshape(x_test.shape[0], -1)
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
+    model = models.Sequential()
+    model.add(Dense(256, activation='relu', input_shape=(28*28, )))
+    model.add(Dense(10, activation='softmax'))
 
-history = nn.fit(x_train[:, :], y_train, epochs=6, batch_size=64)
+    model.compile(optimizer='adam', loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+    x_train = x_train.reshape(x_train.shape[0], -1)
+    x_test = x_test.reshape(x_test.shape[0], -1)
+    y_train = to_categorical(y_train)
+    y_test = to_categorical(y_test)
+
+    history = model.fit(x_train[:, :], y_train, epochs=6, batch_size=64)
+    model.save('handwritten_digits.model')
+
+else:
+    model = models.load_model('handwritten_digits.model')
 
 
 def digit_recognition(image, height, width):
@@ -55,7 +65,7 @@ def digit_recognition(image, height, width):
     predicted = []
     convertedImage = detected_images
     for i in range(len(convertedImage)):
-        predict = nn.predict(np.reshape(convertedImage[i], (1, 784)))
+        predict = model.predict(np.reshape(convertedImage[i], (1, 784)))
         predicted.append(predict.argmax())
     y = 0
     for rect in rects:
