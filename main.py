@@ -32,13 +32,15 @@ if train_new_model:
 
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Dense(
-        256, activation='relu', input_shape=(28*28, )))
+        512, activation='relu', input_shape=(28*28, )))
     model.add(tf.keras.layers.Dense(10, activation='softmax'))
 
-    model.compile(optimizer='adam', loss='categorical_crossentropy',
+    optimizer = tf.keras.optimizers.Adamax()
+    model.compile(optimizer=optimizer, loss='categorical_crossentropy',
                   metrics=['accuracy'])
     x_train = x_train.reshape(x_train.shape[0], -1)
     x_test = x_test.reshape(x_test.shape[0], -1)
+
     y_train = tf.keras.utils.to_categorical(y_train)
     y_test = tf.keras.utils.to_categorical(y_test)
 
