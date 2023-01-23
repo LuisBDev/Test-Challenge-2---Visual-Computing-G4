@@ -44,8 +44,8 @@ if train_new_model:
     y_train = tf.keras.utils.to_categorical(y_train)
     y_test = tf.keras.utils.to_categorical(y_test)
 
-    history = model.fit(x_train[:, :], y_train, epochs=6, batch_size=64)
-    model.save('handwritten_digits.model')
+    model.fit(x_train[:, :], y_train, epochs=6, batch_size=64)
+    model.save('handwritten_digits.model', save_format='h5')
 
 else:
     model = tf.keras.models.load_model('handwritten_digits.model')
