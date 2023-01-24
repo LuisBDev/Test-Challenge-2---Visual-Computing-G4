@@ -13,15 +13,11 @@ from pathlib import Path
 from scipy.ndimage.morphology import binary_dilation
 from skimage.io import imread_collection
 
-'''from tensorflow.keras import models
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.utils import to_categorical'''
 
 current_directory = Path(__file__).resolve().parent
 
 train_new_model = False
-option = input("Quieres entrar un nuevo MODELO? (y/n): ")
+option = input("Quieres entrenar un nuevo MODELO? (y/n): ")
 if option in ["y", "Y"]:
     train_new_model = True
 
@@ -35,9 +31,12 @@ if train_new_model:
         512, activation='relu', input_shape=(28*28, )))
     model.add(tf.keras.layers.Dense(10, activation='softmax'))
 
+# ---------------------------------------------------------------
+
     optimizer = tf.keras.optimizers.Adamax()
     model.compile(optimizer=optimizer, loss='categorical_crossentropy',
                   metrics=['accuracy'])
+
     x_train = x_train.reshape(x_train.shape[0], -1)
     x_test = x_test.reshape(x_test.shape[0], -1)
 
@@ -54,11 +53,14 @@ else:
 def digit_recognition(image, height, width):
     im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     im_gray = cv2.GaussianBlur(im_gray, (5, 5), 0)
+
     threshold, bwImage = cv2.threshold(im_gray, 90, 255, cv2.THRESH_BINARY_INV)
     ctrs, hier = cv2.findContours(
         bwImage.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
     rects = [cv2.boundingRect(ctr) for ctr in ctrs]
     detected_images = []
+
     for rect in rects:
         leng = int(rect[3] * 1.6)
         pt1 = int(rect[1] + rect[3] // 2 - leng // 2)
@@ -70,10 +72,12 @@ def digit_recognition(image, height, width):
     cv2.waitKey()
     predicted = []
     convertedImage = detected_images
+
     for i in range(len(convertedImage)):
         predict = model.predict(np.reshape(convertedImage[i], (1, 784)))
         predicted.append(predict.argmax())
     y = 0
+
     for rect in rects:
         cv2.rectangle(image, (rect[0], rect[1]), (rect[0] +
                       rect[2], rect[1] + rect[3]), (0, 255, 0), 3)
@@ -123,4 +127,4 @@ for k in range(0, len(img)):
         correct_predictions = correct_predictions + 1
 
 accuracy = (correct_predictions/len(img))*100
-# print("Accuracy of the model is: ", accuracy)
+print("Accuracy of the model is: ", accuracy)
